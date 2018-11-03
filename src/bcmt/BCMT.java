@@ -16,6 +16,8 @@ public class BCMT {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        MainForm mf = new MainForm();
+        mf.setVisible(true);
     }
     
 }
