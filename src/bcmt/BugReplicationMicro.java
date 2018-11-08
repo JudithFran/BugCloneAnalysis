@@ -69,19 +69,84 @@ public class BugReplicationMicro {
     
     
     public void getChangedBugFixCommits(){
+        
+        SingleChange[] changedBugFixCommits = new SingleChange[10000];
+        
         try{
-            
-        String bugFixCommits = getBugFixCommits();
-        String [] str = new String [10000];
         
-        str = bugFixCommits.split("  ");
+        String str = getBugFixCommits();
+        String[] bugFixCommits = new String[10000];
         
-        for(int i=0; i<str.length; i++){
-            System.out.println("Revision = " + str[i]);    
+        SingleChange[] changes = db.getChangedRevisions();
+       
+        /*
+        for(int j=0; changes[j] != null; j++){
+            System.out.println("Revision [" + j + "]= " + changes[j].revision);
+        }
+        */
+        
+        bugFixCommits = str.split("  ");
+        
+        
+        String[] bugFixCommitsReverse = new String[10000];
+        int i = 0;
+        for(int j = bugFixCommits.length-1; j>=0; j--){
+            bugFixCommitsReverse[i] = bugFixCommits[j];
+            //System.out.println("Bug Fix Revision [" + i + "] in Reverse = " + bugFixCommitsReverse[i] + " Where j = " + j);
+            i++;    
+        }
+        int len = i;
+        
+        int k = 0;
+        for(i = 0; i < len; i++){
+            for(int j = 0; changes[j] != null; j++){
+                if (bugFixCommitsReverse[i].equals(changes[j].revision)){
+                    changedBugFixCommits[k] = changes[j];
+                    System.out.println("Revision [" + k + "] in changedBugFixCommits = " + changedBugFixCommits[k].revision);
+                    k++;
+                }
+            }
         }
         
-        db.getChangedRevisions();
+        /*-------------------------------------------------------------------------- small sample test ----------------------------------------------------------------------
+        String[] bugFixCommitsTest = new String[100];
+        for(i = 0; i < 5; i++){
+            bugFixCommitsTest[i] = bugFixCommitsReverse[i];
+            System.out.println("Bug Fix Revision [" + i + "] First Five Values = " + bugFixCommitsTest[i]);
+        }
+        int len2 = i;
+        System.out.println("Length of bugFixCommitsTest = " + len2);
         
+        System.out.println();
+        SingleChange[] changesTest = new SingleChange[100];
+        for(i = 0; i < 10; i++){
+            changesTest[i] = changes[i];
+            System.out.println("Revision [" + i + "] First Ten Values (revision)= " + changesTest[i].revision);
+            //System.out.println("Revision [" + i + "] First Ten Values (filepath)= " + changesTest[i].filepath);
+            //System.out.println("Revision [" + i + "] First Ten Values (startline)= " + changesTest[i].startline);
+            //System.out.println("Revision [" + i + "] First Ten Values (endline)= " + changesTest[i].endline);
+            //System.out.println("Revision [" + i + "] First Ten Values (changetype)= " + changesTest[i].changetype);
+            //System.out.println("\n");
+        }
+        
+        System.out.println();
+        SingleChange[] changedBugFixCommitsTest = new SingleChange[100];
+        int k = 0;
+        
+        int len = i;
+        System.out.println("Length of changesTest = " + len);
+        
+        for(i = 0; i < len2; i++){
+            for(int j = 0; j < len; j++){
+                if (bugFixCommitsTest[i].equals(changesTest[j].revision)){
+                    changedBugFixCommitsTest[k] = changesTest[j];
+                    System.out.println("Revision [" + k + "] in changedBugFixCommitsTest = " + changedBugFixCommitsTest[k].revision);
+                    k++;
+                }
+            }
+        }
+        -------------------------------------------------------------------------- small sample test ------------------------------------------------------------------------*/
+              
         }catch(Exception e){
             System.out.println ("error.getChangedBugFixCommits." + e);
         }
