@@ -8,10 +8,21 @@ package bcmt;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -230,7 +241,7 @@ public class BugReplicationMicro {
         return changedBugFixCommits;
     }
     
-    public void isClonePair(){
+    public void isClonePair() throws ParserConfigurationException, SAXException, IOException{
         try{
         CodeFragment cf1 = new CodeFragment();
         CodeFragment cf2 = new CodeFragment();
@@ -238,10 +249,10 @@ public class BugReplicationMicro {
         SingleChange[] changedBugFixCommits = new SingleChange[10000];
         
         changedBugFixCommits = getChangedBugFixCommits();
-        
+        /*
         for(int i = 0; changedBugFixCommits[i] != null; i++)
             System.out.println("Revision [" + i + "] in changedBugFixCommits in isClonePair()= " + changedBugFixCommits[i].revision);
-        
+        */
         
         cf1.revision = Integer.parseInt(changedBugFixCommits[0].revision);
         cf1.startline = Integer.parseInt(changedBugFixCommits[0].startline);
@@ -256,8 +267,116 @@ public class BugReplicationMicro {
         
         cf2.getFragment();
         cf2.showFragment();
+        
+        /*---------------------------------------XML file parsing started here-------------------------------------------------*/
+        
+        //File microfXmlFile = new File("carolversion-1700_blocks-blind-clones-0.11.xml"); //All Type
+        File regularfXmlFile = new File("D:/ManiBhaiBackup/systems/ctags/repository/version-15_blocks-blind-clones/version-15_blocks-blind-clones-0.3.xml"); //All Type
+        
+        
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        //Document docMicro = dBuilder.parse(microfXmlFile); 
+        
+        Document docRegular = dBuilder.parse(regularfXmlFile);
+        
+        //optional, but recommended
+        //read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
+        
+        //docMicro.getDocumentElement().normalize();
+        
+        docRegular.getDocumentElement().normalize();
+        
+        //System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
+        
+        //NodeList nListMicro = docMicro.getElementsByTagName("clone");
+        
+        NodeList nListRegular = docRegular.getElementsByTagName("class");
+        
+        
+        int count = 0;
+        /*
+        for (int i = 0; i < nListMicro.getLength(); i++) {
+
+            Node nNodeMicro = nListMicro.item(i);
+            
+            ///System.out.println("\nCurrent Element in Micro : " + nNodeMicro.getNodeName());
+            
+            if (nNodeMicro.getNodeType() == Node.ELEMENT_NODE) {
+
+			Element eElementMicro = (Element) nNodeMicro;
+
+			//System.out.println("File Name : " + eElement.getAttribute("file"));
+                        
+                        Element cElementMicro =  (Element) eElementMicro.getElementsByTagName("source").item(0);
+                        String microCloneFragment1 = cElementMicro.getAttribute("file");
+                        //System.out.println("\nFirst File in Micro : " + microCloneFragment1);
+                        
+                        Element ccElementMicro =  (Element) eElementMicro.getElementsByTagName("source").item(1);
+                        String microCloneFragment2 = ccElementMicro.getAttribute("file");
+                        //System.out.println("Second File in Micro : " + microCloneFragment2);
+                        
+                        //Compare each micro-clone pair with the regular clone pair
+        */
+                        
+                        for (int i = 0; i < nListRegular.getLength(); i++) {
+                        
+                            Node nNodeRegular = nListRegular.item(i);
+                            
+                            ///System.out.println("\nCurrent Element in Regular : " + nNodeRegular.getNodeName());
+                            
+                            if (nNodeRegular.getNodeType() == Node.ELEMENT_NODE) {
+
+                                Element eElementRegular = (Element) nNodeRegular;
+                                
+                                int j = 0;
+                                //while(eElementRegular.getElementsByTagName("source")){
+                                Element cElementRegular =  (Element) eElementRegular.getElementsByTagName("source");
+                                
+                                //Element cElementRegular =  (Element) eElementRegular.getElementsByTagName("source").item(0);
+                                
+                                
+                                String str1 = cElementRegular.getAttribute("file");
+                                if(str1.contains("version-")){
+                                    str1 = str1.replaceAll(".ifdefed", "");
+                                    
+                                    String[] filePath = str1.split("version-\\d*\\/");
+                                    str1 = filePath[1];
+                                    
+                                    System.out.println("Working str1 = " + str1);
+                                }
+                                
+                                String regularCloneFragment1 = str1;
+                                
+                                //System.out.println("\nFirst File in Regular : " + regularCloneFragment1);
+                        
+                                Element ccElementRegular =  (Element) eElementRegular.getElementsByTagName("source").item(1);
+                                String str2 = ccElementRegular.getAttribute("file");
+                                if(str2.contains("version-")){
+                                    str2 = str2.replaceAll(".ifdefed", "");
+                                    
+                                    String[] filePath = str2.split("version-\\d*\\/");
+                                    str2 = filePath[1];
+                                    
+                                    System.out.println("Working str2 = " + str2);
+                                }
+                                
+                                String regularCloneFragment2 = str2;
+                                //System.out.println("Second File in Regular : " + regularCloneFragment2);
+                                                              
+                                //if (microCloneFragment1.equals(regularCloneFragment1) && microCloneFragment2.equals(regularCloneFragment2)){
+                                if (cf1.filepath.equals(regularCloneFragment1) && (cf2.filepath.equals(regularCloneFragment2))){
+                                    System.out.println("\n\n*************************************************************Flag ********************** Found***************************************************************** " + count + "\n");
+                                    count++;
+                                }
+                                
+                                //}
+                            }   
+                        }
+  
+        System.out.println("Count = " + count);
         }catch(Exception e){
-            System.out.println("error.isClonePair." + e);
+            System.out.println("error in method isClonePair." + e);
             e.printStackTrace();
         }
         
