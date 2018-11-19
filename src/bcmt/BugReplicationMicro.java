@@ -37,12 +37,12 @@ class CodeFragment{
     int startline = -1, endline = -1;
     String changetype = "-1";
 
-    String [] lines = new String[1000];
+    String [] lines = new String[10000];
     
     
     public void getFragment(){
         
-        String abs_filepath = "D:/ManiBhaiBackup/systems/ctags/repository/version-" + revision + "/"+ filepath;
+        String abs_filepath = "D:/ManiBhaiBackup/systems/ctags/repository/version-" + revision + "/"+ filepath; // Have to make it variable
         try{
             BufferedReader br = new BufferedReader (new InputStreamReader (new FileInputStream (abs_filepath)));
             String str = "";
@@ -67,7 +67,7 @@ class CodeFragment{
     }
     
     public void showFragment (){
-        String abs_filepath = "D:/ManiBhaiBackup/systems/ctags/repository/version-" + revision + "/"+ filepath;
+        String abs_filepath = "D:/ManiBhaiBackup/systems/ctags/repository/version-" + revision + "/"+ filepath; // Have to make it variable
         try{
             BufferedReader br = new BufferedReader (new InputStreamReader (new FileInputStream (abs_filepath)));
             String str = "";
@@ -102,7 +102,7 @@ public class BugReplicationMicro {
     public String getBugFixCommits(){
         String bugFixCommits = "";
         try{
-            BufferedReader br = new BufferedReader (new InputStreamReader (new FileInputStream ("commitlog.txt")));
+            BufferedReader br = new BufferedReader (new InputStreamReader (new FileInputStream ("commitlog.txt"))); // Have to make it variable
             
             String str = "";            
             String prevString = "";
@@ -190,7 +190,7 @@ public class BugReplicationMicro {
             for(int j = 0; changes[j] != null; j++){
                 if (bugFixCommitsReverse[i].equals(changes[j].revision)){
                     changedBugFixCommits[k] = changes[j];
-                    System.out.println("Revision [" + k + "] in changedBugFixCommits = " + changedBugFixCommits[k].revision);
+                    //System.out.println("Revision [" + k + "] in changedBugFixCommits = " + changedBugFixCommits[k].revision);
                     k++;
                 }
             }
@@ -250,25 +250,32 @@ public class BugReplicationMicro {
         
         changedBugFixCommits = getChangedBugFixCommits();
         /*
-        for(int i = 0; changedBugFixCommits[i] != null; i++)
+        int lenChangedBugFixCommits = 0;
+        for(int i = 0; changedBugFixCommits[i] != null; i++){
             System.out.println("Revision [" + i + "] in changedBugFixCommits in isClonePair()= " + changedBugFixCommits[i].revision);
+            lenChangedBugFixCommits = i;
+        }
+        System.out.println("Length of the changedBugFixCommits = " + lenChangedBugFixCommits);
         */
-        
-        cf1.revision = Integer.parseInt(changedBugFixCommits[0].revision);
-        cf1.startline = Integer.parseInt(changedBugFixCommits[0].startline);
-        cf1.endline = Integer.parseInt(changedBugFixCommits[0].endline);
-        cf1.filepath = changedBugFixCommits[0].filepath;
-        cf1.changetype = changedBugFixCommits[0].changetype;
+        // Have to make loop for all changed bug-fix commits
+        for(int m = 0; changedBugFixCommits[m] != null; m++){
+        cf1.revision = Integer.parseInt(changedBugFixCommits[m].revision);
+        cf1.startline = Integer.parseInt(changedBugFixCommits[m].startline);
+        cf1.endline = Integer.parseInt(changedBugFixCommits[m].endline);
+        cf1.filepath = changedBugFixCommits[m].filepath;
+        cf1.changetype = changedBugFixCommits[m].changetype;
         cf1.getFragment();
         cf1.showFragment();
         
         
         cf2 = getInstanceInNextRevision(cf1);
-        
+        if(cf2 == null){continue;}
         cf2.getFragment();
         cf2.showFragment();
         
         /*---------------------------------------XML file parsing started here-------------------------------------------------*/
+        
+        // Have to make it variable
         
         //File microfXmlFile = new File("carolversion-1700_blocks-blind-clones-0.11.xml"); //All Type
         File regularfXmlFile = new File("D:/ManiBhaiBackup/systems/ctags/repository/version-15_blocks-blind-clones/version-15_blocks-blind-clones-0.3.xml"); //All Type
@@ -294,7 +301,7 @@ public class BugReplicationMicro {
         NodeList nListRegular = docRegular.getElementsByTagName("class");
         
         
-        int count = 0;
+        int pair = 0;
         /*
         for (int i = 0; i < nListMicro.getLength(); i++) {
 
@@ -317,64 +324,91 @@ public class BugReplicationMicro {
                         //System.out.println("Second File in Micro : " + microCloneFragment2);
                         
                         //Compare each micro-clone pair with the regular clone pair
-        */
-                        
+        */              
+                        /*
+                        for (int i = 0; i < nl.getLength(); i++)
+                            {
+                            Node currentItem = nl.item(i);
+                            String key = currentItem.getAttributes().getNamedItem("type").getNodeValue();
+                            System.out.println(key);
+                            }
+                        */
                         for (int i = 0; i < nListRegular.getLength(); i++) {
                         
                             Node nNodeRegular = nListRegular.item(i);
+                            //System.out.println("\nCurrent Element in Regular : " + nNodeRegular.getNodeName());
+                                                
+                            int numFragments = 0;
+                            numFragments = Integer.parseInt(nNodeRegular.getAttributes().getNamedItem("nfragments").getNodeValue());
+                            //System.out.println("numFragments = " + numFragments);
                             
-                            ///System.out.println("\nCurrent Element in Regular : " + nNodeRegular.getNodeName());
+                            int classID = 0;
+                            classID = Integer.parseInt(nNodeRegular.getAttributes().getNamedItem("id").getNodeValue());
+                            System.out.println("classID = " + classID);
                             
-                            if (nNodeRegular.getNodeType() == Node.ELEMENT_NODE) {
+                            if (nNodeRegular.getNodeType() == Node.ELEMENT_NODE){
 
                                 Element eElementRegular = (Element) nNodeRegular;
                                 
-                                int j = 0;
-                                //while(eElementRegular.getElementsByTagName("source")){
-                                Element cElementRegular =  (Element) eElementRegular.getElementsByTagName("source");
+                                CodeFragment[] cfXmlFile = new CodeFragment[10000];
                                 
-                                //Element cElementRegular =  (Element) eElementRegular.getElementsByTagName("source").item(0);
-                                
-                                
-                                String str1 = cElementRegular.getAttribute("file");
-                                if(str1.contains("version-")){
-                                    str1 = str1.replaceAll(".ifdefed", "");
+                                for(int j = 0; j<numFragments; j++){
+                                                                
+                                    Element cElementRegular =  (Element) eElementRegular.getElementsByTagName("source").item(j);
+                                    //System.out.println("\nNumber of Child Node of Element in Regular : " + cElementRegular.getChildNodes().getLength());
                                     
-                                    String[] filePath = str1.split("version-\\d*\\/");
-                                    str1 = filePath[1];
+                                    cfXmlFile[j] = new CodeFragment();
                                     
-                                    System.out.println("Working str1 = " + str1);
+                                    cfXmlFile[j].filepath = cElementRegular.getAttribute("file");
+                                    cfXmlFile[j].startline = Integer.parseInt(cElementRegular.getAttribute("startline"));
+                                    cfXmlFile[j].endline = Integer.parseInt(cElementRegular.getAttribute("endline"));
+                                    if(cfXmlFile[j].filepath.contains("version-")){
+                                        cfXmlFile[j].filepath = cfXmlFile[j].filepath.replaceAll(".ifdefed", "");
+                                    
+                                        String[] filePath = cfXmlFile[j].filepath.split("version-\\d*\\/");
+                                        cfXmlFile[j].filepath = filePath[1];
+                                    
+                                        System.out.println("Working str1 = " + cfXmlFile[j].filepath);
+                                    }
+                                
+                                    //String regularCloneFragment1 = cfXmlFile[j].filepath;
+                                
+                                    //System.out.println("\nFirst File in Regular : " + regularCloneFragment1);
+                                    
+                                                                    
+                                    //String regularCloneFragment2 = str2;
+                                    //System.out.println("Second File in Regular : " + regularCloneFragment2);
+                                
+                                    if(j+1 == numFragments-1){
+                                        break;
+                                    }
                                 }
-                                
-                                String regularCloneFragment1 = str1;
-                                
-                                //System.out.println("\nFirst File in Regular : " + regularCloneFragment1);
-                        
-                                Element ccElementRegular =  (Element) eElementRegular.getElementsByTagName("source").item(1);
-                                String str2 = ccElementRegular.getAttribute("file");
-                                if(str2.contains("version-")){
-                                    str2 = str2.replaceAll(".ifdefed", "");
-                                    
-                                    String[] filePath = str2.split("version-\\d*\\/");
-                                    str2 = filePath[1];
-                                    
-                                    System.out.println("Working str2 = " + str2);
+                                for(int j = 0; j<numFragments; j++){
+                                    if(cf1.filepath.equals(cfXmlFile[j].filepath) && cf1.startline == cfXmlFile[j].startline && cf1.endline == cfXmlFile[j].endline){
+                                        for(int k = 0; k<numFragments; k++){
+                                            if(cf2.filepath.equals(cfXmlFile[k].filepath) && cf2.startline == cfXmlFile[k].startline && cf2.endline == cfXmlFile[k].endline){
+                                                if(j!=k){
+                                                    pair = 1;
+                                                    System.out.println("*************************************************************Found a ********************** Clone Pair*****************************************************************");
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if(j+1 == numFragments-1){
+                                        break;
+                                    }
                                 }
-                                
-                                String regularCloneFragment2 = str2;
-                                //System.out.println("Second File in Regular : " + regularCloneFragment2);
-                                                              
-                                //if (microCloneFragment1.equals(regularCloneFragment1) && microCloneFragment2.equals(regularCloneFragment2)){
-                                if (cf1.filepath.equals(regularCloneFragment1) && (cf2.filepath.equals(regularCloneFragment2))){
-                                    System.out.println("\n\n*************************************************************Flag ********************** Found***************************************************************** " + count + "\n");
-                                    count++;
-                                }
-                                
-                                //}
+                                    //if (microCloneFragment1.equals(regularCloneFragment1) && microCloneFragment2.equals(regularCloneFragment2)){
+                                    /*
+                                    if (cf1.filepath.equals(regularCloneFragment1) && (cf2.filepath.equals(regularCloneFragment2))){
+                                        System.out.println("\n\n*************************************************************Flag ********************** Found***************************************************************** " + count + "\n");
+                                        count++;
+                                    }
+                                    */
                             }   
                         }
-  
-        System.out.println("Count = " + count);
+        System.out.println("isPair returns = " + pair);
+        }
         }catch(Exception e){
             System.out.println("error in method isClonePair." + e);
             e.printStackTrace();
@@ -383,6 +417,7 @@ public class BugReplicationMicro {
     }
     
     public CodeFragment getInstanceInNextRevision(CodeFragment cf){
+        try{
         CodeFragment instance = new CodeFragment ();
         
         int crevision = cf.revision;
@@ -393,8 +428,8 @@ public class BugReplicationMicro {
         
         int changed = 0;
         
-        String cfilepath = "D:/ManiBhaiBackup/systems/ctags/repository/version-" + crevision + "/"+ cf.filepath;
-        String nfilepath = "D:/ManiBhaiBackup/systems/ctags/repository/version-" + nrevision + "/"+ cf.filepath;
+        String cfilepath = "D:/ManiBhaiBackup/systems/ctags/repository/version-" + crevision + "/"+ cf.filepath; // Have to make it variable
+        String nfilepath = "D:/ManiBhaiBackup/systems/ctags/repository/version-" + nrevision + "/"+ cf.filepath; // Have to make it variable
         
         File file = new File (nfilepath);
         if (!file.exists()) { return null; }
@@ -408,9 +443,12 @@ public class BugReplicationMicro {
             if (ln.length() == 0) {continue;}
             int line = Integer.parseInt(ln);
             if (line > cf.endline) {break;}
+            if (line == 509) {
+                int a = 10;
+            }
             if (line >= cf.startline && line <= cf.endline)
             {
-                String nln = filecompare[i][2].trim();
+                String nln = filecompare[i][2].trim(); // SHOWING NULL POINTER EXCEPTION HERE
                 if (nln.trim().length() > 0)
                 {
                     int nline = Integer.parseInt (nln);
@@ -439,5 +477,9 @@ public class BugReplicationMicro {
         instance.changetype = cf.changetype;
         
         return instance;
+    
+    }catch(Exception e){
+            return null;
+        }
     }
 }
