@@ -92,6 +92,65 @@ class CodeFragment {
 }
 
 public class BugReplicationMicro {
+    
+    public void BugReplication(){
+        try{
+            SingleChange[] changedBugFixCommits = new SingleChange[10000];
+            changedBugFixCommits = getChangedBugFixCommits();
+            
+            CodeFragment cf1 = new CodeFragment();
+            CodeFragment cf2 = new CodeFragment();
+            int numReplicatedBugFixCommits = 0;
+            CodeFragment[] bugRep = new CodeFragment[10000];
+            int i = 0;
+            
+            for (int m = 0; changedBugFixCommits[m] != null; m++) {
+                cf1.revision = Integer.parseInt(changedBugFixCommits[m].revision);
+                cf1.startline = Integer.parseInt(changedBugFixCommits[m].startline);
+                cf1.endline = Integer.parseInt(changedBugFixCommits[m].endline);
+                cf1.filepath = changedBugFixCommits[m].filepath;
+                cf1.changetype = changedBugFixCommits[m].changetype;
+
+                System.out.println("\nCode Fragment 1 (CF1): ");
+                cf1.getFragment();
+                cf1.showFragment();
+                
+                cf2 = isClonePair(cf1);
+                
+                if(cf2 != null){
+                    CodeFragment cf1INR = new CodeFragment();
+                    CodeFragment cf2INR = new CodeFragment();
+                    //CodeFragment cf0INR = new CodeFragment();
+                    
+                    cf1INR = getInstanceInNextRevision(cf1);
+                    cf2INR = getInstanceInNextRevision(cf2);
+                    
+                    //cf0INR = isClonePair(cf1);
+                    if(cf1INR != null && cf2INR != null){
+                        if(isClonePairBinary(cf1INR, cf2INR) == 1){
+                            numReplicatedBugFixCommits++;
+                            System.out.println("////////////////////////////////////////////////////////////////////////////Replicated Bug Fixing Change Found////////////////////////////////////////////////////////////////////////////.");
+                            bugRep[i] = cf1;
+                            if(bugRep[i] != cf2){
+                                bugRep[i+1] = cf2;
+                                i++;
+                            }
+                            i++;
+                        }
+                    }
+                }
+            }
+            
+            for(int j=0; bugRep[j] != null;j++){
+                System.out.println("This is the array of replicated bugs: j = " + j);
+                bugRep[j].showFragment();
+            }
+            System.out.println("Total Replicated Bug-Fixing Commits = " + numReplicatedBugFixCommits);
+        }catch(Exception e){
+            System.out.println("error in BugReplication()." + e);
+            e.printStackTrace();
+        }
+    }
 
     DBConnect db = new DBConnect();
     CompareChanges cc = new CompareChanges();
@@ -228,51 +287,30 @@ public class BugReplicationMicro {
         }
         return changedBugFixCommits;
     }
-
-    public int isClonePair() throws ParserConfigurationException, SAXException, IOException {
+    public int isClonePairBinary(CodeFragment cf1, CodeFragment cf2){
         int pair = 0;
-        try {
-            CodeFragment cf1 = new CodeFragment();
-            CodeFragment cf2 = new CodeFragment();
+        try{
+            CodeFragment[][] cfXmlFile = new CodeFragment[10000][10000];
 
-            SingleChange[] changedBugFixCommits = new SingleChange[10000];
-            changedBugFixCommits = getChangedBugFixCommits();
+            cfXmlFile = xmlFileParse(cf1.revision, cf1.changetype);
 
-            /*
-            int lenChangedBugFixCommits = 0;
-            for(int i = 0; changedBugFixCommits[i] != null; i++){
-                System.out.println("Revision [" + i + "] in changedBugFixCommits in isClonePair()= " + changedBugFixCommits[i].revision);
-                lenChangedBugFixCommits = i;
-            }
-            System.out.println("Length of the changedBugFixCommits = " + lenChangedBugFixCommits);
-            */
-            // Have to make loop for all changed bug-fix commits --- DONE
-            for (int m = 0; changedBugFixCommits[m] != null; m++) {
-                cf1.revision = Integer.parseInt(changedBugFixCommits[m].revision);
-                cf1.startline = Integer.parseInt(changedBugFixCommits[m].startline);
-                cf1.endline = Integer.parseInt(changedBugFixCommits[m].endline);
-                cf1.filepath = changedBugFixCommits[m].filepath;
-                cf1.changetype = changedBugFixCommits[m].changetype;
+            for (int i = 0; i < cfXmlFile.length; i++) {
+                for (int j = 0; j < cfXmlFile.length; j++) {
 
-                System.out.println("\nCode Fragment 1 (CF1): ");
-                cf1.getFragment();
-                cf1.showFragment();
-
-                CodeFragment[][] cfXmlFile = new CodeFragment[10000][10000];
-
-                cfXmlFile = xmlFileParse(Integer.parseInt(changedBugFixCommits[m].revision), changedBugFixCommits[m].changetype);
-
-                for (int i = 0; i < cfXmlFile.length; i++) {
-                    for (int j = 0; j < cfXmlFile.length; j++) {
-
-                        if (cfXmlFile[i][j] != null){
-                            //System.out.println("cfXmlFile[" + i + "][" + j + "] = " + cfXmlFile[i][j].filepath);
-                            
-                            //cfXmlFile[i][j] = new CodeFragment();
-                            if(cf1.filepath.equals(cfXmlFile[i][j].filepath)){
-                                
+                    if (cfXmlFile[i][j] != null){
+                        //System.out.println("cfXmlFile[" + i + "][" + j + "] = " + cfXmlFile[i][j].filepath);
+                        if(cf1.filepath.equals(cfXmlFile[i][j].filepath)){
+                            /*
+                            System.out.println("cf1.startline = " + cf1.startline);
+                            System.out.println("cfXmlFile["+i+"]["+j+"].startline = " +cfXmlFile[i][j].startline);
+                            System.out.println("cf1.endline = " + cf1.endline);
+                            System.out.println("cfXmlFile["+i+"]["+j+"].endline = " +cfXmlFile[i][j].endline);
+                            */
+                            if(((cf1.startline >= cfXmlFile[i][j].startline) && (cf1.endline <= cfXmlFile[i][j].endline))
+                                    ||((cf1.startline <= cfXmlFile[i][j].startline) && (cf1.endline <= cfXmlFile[i][j].endline) && (cf1.endline >= cfXmlFile[i][j].startline)) 
+                                        ||((cf1.startline >= cfXmlFile[i][j].startline) && (cf1.endline >= cfXmlFile[i][j].endline) && (cf1.startline <= cfXmlFile[i][j].endline))){
                                 System.out.println("cfXmlFile[" + i + "][" + j + "] filepath = " + cfXmlFile[i][j].filepath + " revision = " 
-                                        + cfXmlFile[i][j].revision + " startline = " + cfXmlFile[i][j].startline + " endline = " + cfXmlFile[i][j].endline);
+                                    + cfXmlFile[i][j].revision + " startline = " + cfXmlFile[i][j].startline + " endline = " + cfXmlFile[i][j].endline);
                                 
                                 if(cfXmlFile[i][j+1] != null && cf1.filepath.equals(cfXmlFile[i][j+1].filepath)){
                                     cf2.revision = cfXmlFile[i][j+1].revision;
@@ -284,20 +322,75 @@ public class BugReplicationMicro {
                                     System.out.println("\nCode Fragment 2 (CF2): ");
                                     cf2.getFragment();
                                     cf2.showFragment();
-                                    pair = 1;
-                                    
+                                    pair = 1;   
                                 }
                             }
                         }
                     }
                 }
-
-            } // for(int m = 0; changedBugFixCommits[m] != null; m++){
-        } catch (Exception e) {
+            }
+        }catch (Exception e) {
             System.out.println("error in method isClonePair." + e);
             e.printStackTrace();
         }
         return pair;
+    }
+    public CodeFragment isClonePair(CodeFragment cf1){ 
+        //int pair = 0;
+        CodeFragment cf2 = new CodeFragment();
+        try {
+            /*
+            int lenChangedBugFixCommits = 0;
+            for(int i = 0; changedBugFixCommits[i] != null; i++){
+                System.out.println("Revision [" + i + "] in changedBugFixCommits in isClonePair()= " + changedBugFixCommits[i].revision);
+                lenChangedBugFixCommits = i;
+            }
+            System.out.println("Length of the changedBugFixCommits = " + lenChangedBugFixCommits);
+            */
+            CodeFragment[][] cfXmlFile = new CodeFragment[10000][10000];
+
+            cfXmlFile = xmlFileParse(cf1.revision, cf1.changetype);
+
+            for (int i = 0; i < cfXmlFile.length; i++) {
+                for (int j = 0; j < cfXmlFile.length; j++) {
+
+                    if (cfXmlFile[i][j] != null){
+                        //System.out.println("cfXmlFile[" + i + "][" + j + "] = " + cfXmlFile[i][j].filepath);
+                        if(cf1.filepath.equals(cfXmlFile[i][j].filepath)){
+                            /*
+                            System.out.println("cf1.startline = " + cf1.startline);
+                            System.out.println("cfXmlFile["+i+"]["+j+"].startline = " +cfXmlFile[i][j].startline);
+                            System.out.println("cf1.endline = " + cf1.endline);
+                            System.out.println("cfXmlFile["+i+"]["+j+"].endline = " +cfXmlFile[i][j].endline);
+                            */
+                            if(((cf1.startline >= cfXmlFile[i][j].startline) && (cf1.endline <= cfXmlFile[i][j].endline))
+                                    ||((cf1.startline <= cfXmlFile[i][j].startline) && (cf1.endline <= cfXmlFile[i][j].endline) && (cf1.endline >= cfXmlFile[i][j].startline)) 
+                                        ||((cf1.startline >= cfXmlFile[i][j].startline) && (cf1.endline >= cfXmlFile[i][j].endline) && (cf1.startline <= cfXmlFile[i][j].endline))){
+                                System.out.println("cfXmlFile[" + i + "][" + j + "] filepath = " + cfXmlFile[i][j].filepath + " revision = " 
+                                    + cfXmlFile[i][j].revision + " startline = " + cfXmlFile[i][j].startline + " endline = " + cfXmlFile[i][j].endline);
+                                
+                                if(cfXmlFile[i][j+1] != null && cf1.filepath.equals(cfXmlFile[i][j+1].filepath)){
+                                    cf2.revision = cfXmlFile[i][j+1].revision;
+                                    cf2.startline = cfXmlFile[i][j+1].startline;
+                                    cf2.endline = cfXmlFile[i][j+1].endline;
+                                    cf2.filepath = cfXmlFile[i][j+1].filepath;
+                                    cf2.changetype = cfXmlFile[i][j+1].changetype;
+                                    System.out.println("************************************************************************************Clone Pair Found************************************************************************************");
+                                    System.out.println("\nCode Fragment 2 (CF2): ");
+                                    cf2.getFragment();
+                                    cf2.showFragment();
+                                    //pair = 1;   
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("error in method isClonePair." + e);
+            e.printStackTrace();
+        }
+        return cf2;
     }
 
     public CodeFragment[][] xmlFileParse(int rev, String ctype) {
