@@ -5,6 +5,12 @@
  */
 package bcmt;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.parsers.ParserConfigurationException;
+import org.xml.sax.SAXException;
+
 /**
  *
  * @author jfi872
@@ -17,7 +23,9 @@ public class MainForm extends javax.swing.JFrame {
     public MainForm() {
         initComponents();
     }
-
+    
+    DBConnect db = new DBConnect();
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -157,8 +165,15 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
-        bugReplicationMicro();
+        try {
+            // TODO add your handling code here:
+            BugReplicationMicro brm = new BugReplicationMicro();
+            brm.BugReplication();  
+        
+        }catch(Exception e){
+            System.out.println("error in BugReplicationMicro." + e);
+            e.printStackTrace();
+        }
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
@@ -169,7 +184,7 @@ public class MainForm extends javax.swing.JFrame {
         // TODO add your handling code here:
         String systemName = "";
         systemName = jComboBox1.getSelectedItem().toString();
-        System.out.println("System selected: " + systemName);
+        //System.out.println("System selected: " + systemName);
         if(systemName == "Ctags")
             jLabel3.setText("<html>System's Name: Ctags <br> Programming Language: C <br> Last Revision Number: 774</html>");
         else if(systemName == "Freecol")
@@ -179,16 +194,6 @@ public class MainForm extends javax.swing.JFrame {
         else if(systemName == "Jabref")
             jLabel3.setText("<html>System's Name: Jabref <br> Programming Language: Java <br> Last Revision Number: 1545</html>");
     }//GEN-LAST:event_jButton5ActionPerformed
-
-    public void bugReplicationMicro(){
-        class bugFixCommit
-        {
-            int commit = 0;
-            String changedClones = "";
-            String changedGcids = "";
-            String changedMethodClones = "";
-        }
-    }
     
     /**
      * @param args the command line arguments
