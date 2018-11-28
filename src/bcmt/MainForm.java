@@ -168,7 +168,7 @@ public class MainForm extends javax.swing.JFrame {
         try {
             // TODO add your handling code here:
             BugReplicationMicro brm = new BugReplicationMicro();
-            brm.BugReplication();  
+            brm.bugReplication();  
         
         }catch(Exception e){
             System.out.println("error in BugReplicationMicro." + e);
