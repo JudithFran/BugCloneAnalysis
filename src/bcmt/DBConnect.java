@@ -12,7 +12,7 @@ import java.sql.Statement;
 
 /**
  *
- * @author jfi872
+ * @author Judith
  */
 
 class SingleChange{
