@@ -7,7 +7,7 @@ package bcmt;
 
 /**
  *
- * @author jfi872
+ * @author Judith
  */
 public class BCMT {
 
