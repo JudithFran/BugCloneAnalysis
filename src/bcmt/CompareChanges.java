@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 
 /**
  *
- * @author jfi872
+ * @author Judith
  */
 public class CompareChanges {
     
