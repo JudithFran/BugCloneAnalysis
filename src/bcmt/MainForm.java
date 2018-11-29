@@ -13,7 +13,7 @@ import org.xml.sax.SAXException;
 
 /**
  *
- * @author jfi872
+ * @author Judith
  */
 public class MainForm extends javax.swing.JFrame {
 
