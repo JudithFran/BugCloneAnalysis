@@ -90,6 +90,7 @@ public class BugReplicationMicro {
     
     //This is the main method. This method is calling all other methods.
     public void bugReplication(){
+        CodeFragment[][] cfXmlFileMicro = new CodeFragment[50000][2];
         try{
             SingleChange[] changedBugFixCommits = new SingleChange[10000];
             changedBugFixCommits = getChangedBugFixCommits();
@@ -99,6 +100,19 @@ public class BugReplicationMicro {
             int numReplicatedBugFixCommits = 0;
             ArrayList<CodeFragment> bugRep = new ArrayList<>();
             
+            cfXmlFileMicro = xmlFileParseMicro(10, "x");
+            
+            /*
+            for (int i = 0; i < cfXmlFileMicro.length; i++) {
+                for (int j = 0; j < cfXmlFileMicro.length; j++) {
+                    if(cfXmlFileMicro[i][j] != null){
+                        System.out.println("bugReplication: cfXmlFileMicro["+i+"]["+j+"].startline = " + cfXmlFileMicro[i][j].startline + " cfXmlFileMicro["+i+"]["+j+"].endline = " 
+                                + cfXmlFileMicro[i][j].endline + " cfXmlFileMicro["+i+"]["+j+"].revision = " + cfXmlFileMicro[i][j].revision);
+                    }
+                }
+            }
+            */
+            
             for (int m = 0; changedBugFixCommits[m] != null; m++) {
                 cf.revision = Integer.parseInt(changedBugFixCommits[m].revision);
                 cf.startline = Integer.parseInt(changedBugFixCommits[m].startline);
@@ -106,7 +120,7 @@ public class BugReplicationMicro {
                 cf.filepath = changedBugFixCommits[m].filepath;
                 cf.changetype = changedBugFixCommits[m].changetype;
 
-                System.out.println("\nCode Fragment 1 (CF1): ");
+                System.out.println("\nCode Fragment (CF): ");
                 cf.getFragment();
                 cf.showFragment();
                 
@@ -122,7 +136,7 @@ public class BugReplicationMicro {
                         if(isClonePairBinary(cloneFragmentPairINR[0], cloneFragmentPairINR[1]) == 1){
                             numReplicatedBugFixCommits++;
                             System.out.println("////////////////////////////////////////////////////////////////////////////Replicated Bug Fixing Change Found////////////////////////////////////////////////////////////////////////////.");
-                            System.out.println("numReplicatedBugFixCommits = " + numReplicatedBugFixCommits);
+                            System.out.println("numReplicatedBugFixCommits for Regular Clones = " + numReplicatedBugFixCommits);
                             
                             if(bugRep.contains(cloneFragmentPair[0])){
                             //if(bugRep.equals(cloneFragmentPair[0])){
@@ -160,6 +174,8 @@ public class BugReplicationMicro {
             */
  
             System.out.println("Total Replicated Bug-Fixing Commits = " + numReplicatedBugFixCommits);
+            
+            
         }catch(Exception e){
             System.out.println("error in BugReplication()." + e);
             e.printStackTrace();
@@ -323,8 +339,8 @@ public class BugReplicationMicro {
                             if(((cf1.startline >= cfXmlFile[i][j].startline) && (cf1.endline <= cfXmlFile[i][j].endline))
                                     ||((cf1.startline <= cfXmlFile[i][j].startline) && (cf1.endline <= cfXmlFile[i][j].endline) && (cf1.endline >= cfXmlFile[i][j].startline)) 
                                         ||((cf1.startline >= cfXmlFile[i][j].startline) && (cf1.endline >= cfXmlFile[i][j].endline) && (cf1.startline <= cfXmlFile[i][j].endline))){
-                                System.out.println("cfXmlFile[" + i + "][" + j + "] filepath = " + cfXmlFile[i][j].filepath + " revision = " 
-                                    + cfXmlFile[i][j].revision + " startline = " + cfXmlFile[i][j].startline + " endline = " + cfXmlFile[i][j].endline);
+                                //System.out.println("cfXmlFile[" + i + "][" + j + "] filepath = " + cfXmlFile[i][j].filepath + " revision = " 
+                                    //+ cfXmlFile[i][j].revision + " startline = " + cfXmlFile[i][j].startline + " endline = " + cfXmlFile[i][j].endline);
                                 
                                 if(cfXmlFile[i][j+1] != null && cf1.filepath.equals(cfXmlFile[i][j+1].filepath)){
                                     cf2.revision = cfXmlFile[i][j+1].revision;
@@ -361,7 +377,6 @@ public class BugReplicationMicro {
             System.out.println("Length of the changedBugFixCommits = " + lenChangedBugFixCommits);
             */
             CodeFragment[][] cfXmlFile = new CodeFragment[10000][10000];
-
             cfXmlFile = xmlFileParse(cf1.revision, cf1.changetype);
 
             for (int i = 0; i < cfXmlFile.length; i++) {
@@ -380,7 +395,7 @@ public class BugReplicationMicro {
                             if(((cf1.startline >= cfXmlFile[i][j].startline) && (cf1.endline <= cfXmlFile[i][j].endline))
                                     ||((cf1.startline <= cfXmlFile[i][j].startline) && (cf1.endline <= cfXmlFile[i][j].endline) && (cf1.endline >= cfXmlFile[i][j].startline)) 
                                         ||((cf1.startline >= cfXmlFile[i][j].startline) && (cf1.endline >= cfXmlFile[i][j].endline) && (cf1.startline <= cfXmlFile[i][j].endline))){
-                                System.out.println("cfXmlFile[" + i + "][" + j + "] filepath = " + cfXmlFile[i][j].filepath + " revision = " 
+                                System.out.println("isClonePair: cfXmlFile[" + i + "][" + j + "] filepath = " + cfXmlFile[i][j].filepath + " revision = " 
                                     + cfXmlFile[i][j].revision + " startline = " + cfXmlFile[i][j].startline + " endline = " + cfXmlFile[i][j].endline);
                                                               
                                 if(cfXmlFile[i][j+1] != null && cf1.filepath.equals(cfXmlFile[i][j+1].filepath)){
@@ -391,7 +406,7 @@ public class BugReplicationMicro {
                                     cfp[0].filepath = cfXmlFile[i][j].filepath;
                                     cfp[0].changetype = cfXmlFile[i][j].changetype;
                                     
-                                    System.out.println("cfp[0].startline = " + cfp[0].startline + " cfp[0].endline = " + cfp[0].endline + " cfp[0].revision = " + cfp[0].revision);
+                                    //System.out.println("cfp[0].startline = " + cfp[0].startline + " cfp[0].endline = " + cfp[0].endline + " cfp[0].revision = " + cfp[0].revision);
                                     
                                     cfp[1] = new CodeFragment();
                                     cfp[1].revision = cfXmlFile[i][j+1].revision;
@@ -400,12 +415,9 @@ public class BugReplicationMicro {
                                     cfp[1].filepath = cfXmlFile[i][j+1].filepath;
                                     cfp[1].changetype = cfXmlFile[i][j+1].changetype;
                                     System.out.println("************************************************************************************Clone Pair Found************************************************************************************");
-                                    System.out.println("\nCode Fragment 2 (CF2): ");
+                                    System.out.println("\nCode Fragment Pair (CFP): ");
                                     cfp[1].getFragment();
                                     cfp[1].showFragment();
-                                    //pair = 1;   
-                                    //System.out.println("cf2 File Path = " + cf2.filepath + " Start Line = " + cf2.startline 
-                                        //+ " End Line = " + cf2.endline);
                                 }
                             }
                         }
@@ -422,11 +434,7 @@ public class BugReplicationMicro {
     public CodeFragment[][] xmlFileParse(int rev, String ctype) {
         CodeFragment[][] cfXmlFile = new CodeFragment[10000][10000];
         try {
-            SingleChange[] changedBugFixCommits = new SingleChange[10000];
-            changedBugFixCommits = getChangedBugFixCommits();
             // Have to make it variable
-
-            //File microfXmlFile = new File("carolversion-1700_blocks-blind-clones-0.11.xml"); //All Type
             File regularXmlFile = new File("D:/ManiBhaiBackup/systems/ctags/repository/version-" + rev + "_blocks-blind-clones/version-" + rev + "_blocks-blind-clones-0.3.xml"); //All Type
 
             if (regularXmlFile.exists()) {
@@ -434,49 +442,16 @@ public class BugReplicationMicro {
                 DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 
-                //Document docMicro = dBuilder.parse(microfXmlFile); 
                 Document docRegular = dBuilder.parse(regularXmlFile);
 
                 //optional, but recommended
                 //read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
-                //docMicro.getDocumentElement().normalize();
-                docRegular.getDocumentElement().normalize();
 
+                docRegular.getDocumentElement().normalize();
                 //System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
-                //NodeList nListMicro = docMicro.getElementsByTagName("clone");
+
                 NodeList nListRegular = docRegular.getElementsByTagName("class");
 
-                /*
-        for (int i = 0; i < nListMicro.getLength(); i++) {
-
-            Node nNodeMicro = nListMicro.item(i);
-            
-            ///System.out.println("\nCurrent Element in Micro : " + nNodeMicro.getNodeName());
-            
-            if (nNodeMicro.getNodeType() == Node.ELEMENT_NODE) {
-
-			Element eElementMicro = (Element) nNodeMicro;
-
-			//System.out.println("File Name : " + eElement.getAttribute("file"));
-                        
-                        Element cElementMicro =  (Element) eElementMicro.getElementsByTagName("source").item(0);
-                        String microCloneFragment1 = cElementMicro.getAttribute("file");
-                        //System.out.println("\nFirst File in Micro : " + microCloneFragment1);
-                        
-                        Element ccElementMicro =  (Element) eElementMicro.getElementsByTagName("source").item(1);
-                        String microCloneFragment2 = ccElementMicro.getAttribute("file");
-                        //System.out.println("Second File in Micro : " + microCloneFragment2);
-                        
-                        //Compare each micro-clone pair with the regular clone pair
-                 */
- /*
-                        for (int i = 0; i < nl.getLength(); i++)
-                            {
-                            Node currentItem = nl.item(i);
-                            String key = currentItem.getAttributes().getNamedItem("type").getNodeValue();
-                            System.out.println(key);
-                            }
-                 */
                 for (int i = 0; i < nListRegular.getLength(); i++) {
 
                     Node nNodeRegular = nListRegular.item(i);
@@ -526,111 +501,227 @@ public class BugReplicationMicro {
         return cfXmlFile;
     }
     
-        public CodeFragment[][] xmlFileParseMicro(int rev, String ctype) {
-        CodeFragment[][] cfXmlFile = new CodeFragment[10000][10000];
+    public CodeFragment[][] xmlFileParseMicro(int rev, String ctype) {
+        CodeFragment[][] cfXmlFileMicro = new CodeFragment[50000][2];
+        CodeFragment[][] cfXmlFileMicroNew = new CodeFragment[50000][2];
+        int lenMicroList;
         try {
-            SingleChange[] changedBugFixCommits = new SingleChange[10000];
-            changedBugFixCommits = getChangedBugFixCommits();
+            CodeFragment[][] cfXmlFile = new CodeFragment[10000][10000];
+            cfXmlFile = xmlFileParse(rev, ctype);
             // Have to make it variable
-
-            //File microfXmlFile = new File("carolversion-1700_blocks-blind-clones-0.11.xml"); //All Type
-            File microXmlFile = new File("D:/MicroClones/Systems/Ctags/Repository/version-" + rev + "_blocks-blind-clones/version-" + rev + "_blocks-blind-clones-0.3.xml"); //All Type
-
+            File microXmlFile = new File("D:/MicroClones/Systems/Ctags/Repository/version-" + rev + "_blocks-blind-clones/version-" + rev + "_blocks-blind-clones-0.30.xml"); //All Type
+            //File microXmlFile = new File("D:/MicroClones/Systems/Ctags/Repository/version-" + rev + "_blocks-blind-clones/version-" + rev + "_blocks-blind-clones-0.3.xml"); //All Type
+                                           
             if (microXmlFile.exists()) {
 
                 DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 
-                //Document docMicro = dBuilder.parse(microfXmlFile); 
-                Document docRegular = dBuilder.parse(microXmlFile);
+                Document docMicro = dBuilder.parse(microXmlFile); 
 
                 //optional, but recommended
                 //read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
-                //docMicro.getDocumentElement().normalize();
-                docRegular.getDocumentElement().normalize();
+                docMicro.getDocumentElement().normalize();
 
-                //System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
-                //NodeList nListMicro = docMicro.getElementsByTagName("clone");
-                NodeList nListRegular = docRegular.getElementsByTagName("class");
+                //System.out.println("Root element :" + docMicro.getDocumentElement().getNodeName());
+                NodeList nListMicro = docMicro.getElementsByTagName("clone");
+                
+                System.out.println("Length of nListMicro = " + nListMicro.getLength());
+                
+                lenMicroList = nListMicro.getLength();
 
-                /*
-        for (int i = 0; i < nListMicro.getLength(); i++) {
+                for (int i = 0; i < nListMicro.getLength(); i++) {
 
-            Node nNodeMicro = nListMicro.item(i);
-            
-            ///System.out.println("\nCurrent Element in Micro : " + nNodeMicro.getNodeName());
-            
-            if (nNodeMicro.getNodeType() == Node.ELEMENT_NODE) {
+                    Node nNodeMicro = nListMicro.item(i);
+                    //System.out.println("\nCurrent Element in Micro : " + nNodeMicro.getNodeName());
 
-			Element eElementMicro = (Element) nNodeMicro;
+                    if (nNodeMicro.getNodeType() == Node.ELEMENT_NODE) {
 
-			//System.out.println("File Name : " + eElement.getAttribute("file"));
-                        
-                        Element cElementMicro =  (Element) eElementMicro.getElementsByTagName("source").item(0);
-                        String microCloneFragment1 = cElementMicro.getAttribute("file");
-                        //System.out.println("\nFirst File in Micro : " + microCloneFragment1);
-                        
-                        Element ccElementMicro =  (Element) eElementMicro.getElementsByTagName("source").item(1);
-                        String microCloneFragment2 = ccElementMicro.getAttribute("file");
-                        //System.out.println("Second File in Micro : " + microCloneFragment2);
-                        
-                        //Compare each micro-clone pair with the regular clone pair
-                 */
- /*
-                        for (int i = 0; i < nl.getLength(); i++)
-                            {
-                            Node currentItem = nl.item(i);
-                            String key = currentItem.getAttributes().getNamedItem("type").getNodeValue();
-                            System.out.println(key);
-                            }
-                 */
-                for (int i = 0; i < nListRegular.getLength(); i++) {
+                        Element eElementMicro = (Element) nNodeMicro;
 
-                    Node nNodeRegular = nListRegular.item(i);
-                    //System.out.println("\nCurrent Element in Regular : " + nNodeRegular.getNodeName());
+                        for (int j = 0; j < 2; j++) {
 
-                    int numFragments = 0;
-                    numFragments = Integer.parseInt(nNodeRegular.getAttributes().getNamedItem("nfragments").getNodeValue());
-                    //System.out.println("numFragments = " + numFragments);
+                            Element cElementMicro = (Element) eElementMicro.getElementsByTagName("source").item(j);
+                            //System.out.println("\nNumber of Child Node of Element in Micro : " + cElementMicro.getChildNodes().getLength());
 
-                    int classID = 0;
-                    classID = Integer.parseInt(nNodeRegular.getAttributes().getNamedItem("id").getNodeValue());
-                    //System.out.println("classID = " + classID);
+                            cfXmlFileMicro[i][j] = new CodeFragment();
+                            cfXmlFileMicro[i][j].revision = rev;
+                            cfXmlFileMicro[i][j].changetype = ctype;
+                            cfXmlFileMicro[i][j].filepath = cElementMicro.getAttribute("file");
+                            cfXmlFileMicro[i][j].startline = Integer.parseInt(cElementMicro.getAttribute("startline"));
+                            cfXmlFileMicro[i][j].endline = Integer.parseInt(cElementMicro.getAttribute("endline"));
+                            if (cfXmlFileMicro[i][j].filepath.contains("version-")) {
+                                cfXmlFileMicro[i][j].filepath = cfXmlFileMicro[i][j].filepath.replaceAll(".ifdefed", "");
 
-                    if (nNodeRegular.getNodeType() == Node.ELEMENT_NODE) {
+                                String[] filePath = cfXmlFileMicro[i][j].filepath.split("version-\\d*\\/");
+                                cfXmlFileMicro[i][j].filepath = filePath[1];
 
-                        Element eElementRegular = (Element) nNodeRegular;
-
-                        for (int j = 0; j < numFragments; j++) {
-
-                            Element cElementRegular = (Element) eElementRegular.getElementsByTagName("source").item(j);
-                            //System.out.println("\nNumber of Child Node of Element in Regular : " + cElementRegular.getChildNodes().getLength());
-
-                            cfXmlFile[i][j] = new CodeFragment();
-                            cfXmlFile[i][j].revision = rev;
-                            cfXmlFile[i][j].changetype = ctype;
-                            cfXmlFile[i][j].filepath = cElementRegular.getAttribute("file");
-                            cfXmlFile[i][j].startline = Integer.parseInt(cElementRegular.getAttribute("startline"));
-                            cfXmlFile[i][j].endline = Integer.parseInt(cElementRegular.getAttribute("endline"));
-                            if (cfXmlFile[i][j].filepath.contains("version-")) {
-                                cfXmlFile[i][j].filepath = cfXmlFile[i][j].filepath.replaceAll(".ifdefed", "");
-
-                                String[] filePath = cfXmlFile[i][j].filepath.split("version-\\d*\\/");
-                                cfXmlFile[i][j].filepath = filePath[1];
-
-                                //System.out.println("cfXmlFile[" + i + "][" + j + "] = " + cfXmlFile[i][j].filepath + " Start Line = " + cfXmlFile[i][j].startline 
-                                        //+ " End Line = " + cfXmlFile[i][j].endline);
+                                //System.out.println("Micro cfXmlFileMicro[" + i + "][" + j + "] = " + cfXmlFileMicro[i][j].filepath + " Micro Start Line = " + cfXmlFileMicro[i][j].startline 
+                                        //+ " Micro End Line = " + cfXmlFileMicro[i][j].endline);
                             }
                         }
                     }
                 }
             }
-
+        
+        // -----------------Converting array to arrayList-------------    
+            
+        ArrayList<CodeFragment> cfXmlFileAL = new ArrayList<>();    
+        
+        for (int i = 0; i < cfXmlFile.length; i++) {
+            for (int j = 0; j < cfXmlFile.length; j++) {
+                if(cfXmlFile[i][j] != null){
+                    cfXmlFileAL.add(cfXmlFile[i][j]);
+                }
+            }
+        }
+            
+            
+        ArrayList<CodeFragment> cfXmlFileMicroAL = new ArrayList<>();
+        
+        for (int i = 0; i < cfXmlFileMicro.length; i++) {
+            for (int j = 0; j < 2; j++) {
+                if(cfXmlFileMicro[i][j] != null){
+                    cfXmlFileMicroAL.add(cfXmlFileMicro[i][j]);
+                }
+            }
+        }
+        
+        //----------------Eliminating Micro-clones which are part of Regular clones-------------------
+        
+        int match = 0;
+        for(int i = 0; i<cfXmlFileMicroAL.size(); i++){
+            for(int j = 0; j<cfXmlFileAL.size(); j++){
+                if(cfXmlFileMicroAL.get(i).filepath.equals(cfXmlFileAL.get(j).filepath)){
+                    if((cfXmlFileMicroAL.get(i).startline >= cfXmlFileAL.get(j).startline) && (cfXmlFileMicroAL.get(i).endline <= cfXmlFileAL.get(j).endline)){
+                        
+                        match++;
+                        System.out.println("Total match found = " + match);
+                        
+                        System.out.println("This is the array of Micro-clones that matches with Regular clones: i = " + i);
+                        System.out.println("Micro cfXmlFileMicro[" + i + "] = " + cfXmlFileMicroAL.get(i).filepath 
+                            + " Micro Start Line = " + cfXmlFileMicroAL.get(i).startline + " Micro End Line = " + cfXmlFileMicroAL.get(i).endline + "\n");
+                        
+                        System.out.println("This is the array of Regular clones that matches with Micro-clones: j = " + j);
+                        System.out.println("cfXmlFileMicro[" + j + "] = " + cfXmlFileAL.get(j).filepath 
+                            + " Start Line = " + cfXmlFileAL.get(j).startline + " End Line = " + cfXmlFileAL.get(j).endline + "\n");
+                        
+                        if(i%2 == 0){
+                            cfXmlFileMicroAL.remove(i);
+                            cfXmlFileMicroAL.remove(i);
+                        }
+                        else{
+                            cfXmlFileMicroAL.remove(i-1);
+                            cfXmlFileMicroAL.remove(i-1);
+                        }
+                    }
+                }
+            }
+        }
+        /*
+        int match = 0; 
+        int i_new = 0; 
+        
+        for(int i = 0; i<cfXmlFileMicro.length; i++){
+            for(int j = 0; j<2; j++){
+                
+                if(cfXmlFileMicro[i][j] != null){
+                    
+                    for(int k = 0; k<cfXmlFile.length ;k++){
+                        for(int l = 0; cfXmlFile[k][l] != null ;l++){
+                            
+                            if(cfXmlFile[k][l] != null){
+                                
+                                if(cfXmlFileMicro[i][j].filepath.equals(cfXmlFile[k][l].filepath)){
+                                    if((cfXmlFileMicro[i][j].startline >= cfXmlFile[k][l].startline) && (cfXmlFileMicro[i][j].endline <= cfXmlFile[k][l].endline)){
+                                        
+                                        System.out.println("Micro cfXmlFileMicro[" + i + "][" + j + "] = " + cfXmlFileMicro[i][j].filepath + " Micro Start Line = " 
+                                            + cfXmlFileMicro[i][j].startline + " Micro End Line = " + cfXmlFileMicro[i][j].endline);
+                                        
+                                        match++;
+                                        System.out.println("Total match number = " + match + " cfXmlFile[" + k + "][" + l + "] = " + cfXmlFile[k][l].filepath 
+                                                + " Start Line = " + cfXmlFile[k][l].startline + " End Line = " + cfXmlFile[k][l].endline + "\n");
+                                        
+                                        
+                                        
+                                        //if(j == 0)
+                                            //cfXmlFileMicroNew[i][j] = cfXmlFileMicro[i][j+1];
+                                            //j = j+1;
+                                        //else if(j == 1)
+                                            //cfXmlFileMicroNew[i][j] = cfXmlFileMicro[i+1][j];
+                                            //i = i+1;
+                                        
+                                    }    
+                                }
+                                //else{
+                                    //cfXmlFileMicroAL.add(cfXmlFileMicro[i][j]);
+                                //}
+                                
+                                else{
+                                    System.out.println("i_new = " + i_new + " j = " + j);
+                                    //cfXmlFileMicroNew[i_new][j_new] = cfXmlFileMicro[i][j];
+                                    cfXmlFileMicroNew[i_new][j] = new CodeFragment();
+                                    cfXmlFileMicroNew[i_new][j].revision = cfXmlFileMicro[i][j].revision;
+                                    cfXmlFileMicroNew[i_new][j].startline = cfXmlFileMicro[i][j].startline;
+                                    cfXmlFileMicroNew[i_new][j].endline = cfXmlFileMicro[i][j].endline;
+                                    cfXmlFileMicroNew[i_new][j].filepath = cfXmlFileMicro[i][j].filepath;
+                                    cfXmlFileMicroNew[i_new][j].changetype = cfXmlFileMicro[i][j].changetype;
+                                    
+                                    System.out.println("New Micro cfXmlFileMicroNew[" + i_new + "][" + j + "] = " + cfXmlFileMicroNew[i_new][j].filepath 
+                                            + " New Micro Start Line = " + cfXmlFileMicroNew[i_new][j].startline + " New Micro End Line = " + cfXmlFileMicroNew[i_new][j].endline);
+                                    
+                                    //i_new++;
+                                }
+                                
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        */
+        
+        
+        
+        
+        /*
+        int total = 0;
+        for (int i = 0; i < cfXmlFileMicroNew.length; i++) {
+            for (int j = 0; j < 2; j++) {
+                if(cfXmlFileMicroNew[i][j] != null){
+                    total++;
+                    System.out.println("Total number of row = " + total + " cfXmlFileMicroNew["+i+"]["+j+"].startline = " + cfXmlFileMicroNew[i][j].startline 
+                            + " cfXmlFileMicroNew["+i+"]["+j+"].endline = " + cfXmlFileMicroNew[i][j].endline + " cfXmlFileMicroNew["+i+"]["+j+"].revision = " 
+                                + cfXmlFileMicroNew[i][j].revision);
+                }
+            }
+        }
+        */
+        /*
+        for(int j=0; j<cfXmlFileMicroAL.size(); j++){
+            System.out.println("This is the array of Micro-clones: j = " + j);
+            System.out.println("Micro cfXmlFileMicro[" + j + "] = " + cfXmlFileMicroAL.get(j).filepath 
+                    + " Micro Start Line = " + cfXmlFileMicroAL.get(j).startline + " Micro End Line = " + cfXmlFileMicroAL.get(j).endline + "\n");
+        }
+        
+        for(int j=0; j<cfXmlFileAL.size(); j++){
+            System.out.println("This is the array of Regular clones: j = " + j);
+            System.out.println("Micro cfXmlFileMicro[" + j + "] = " + cfXmlFileAL.get(j).filepath 
+                    + " Micro Start Line = " + cfXmlFileAL.get(j).startline + " Micro End Line = " + cfXmlFileAL.get(j).endline + "\n");
+        }
+        */
+        for(int j=0; j<cfXmlFileMicroAL.size(); j++){
+            System.out.println("This is the array of Micro-clones which are not part of Regular clones: j = " + j);
+            System.out.println("Micro cfXmlFileMicro[" + j + "] = " + cfXmlFileMicroAL.get(j).filepath 
+                    + " Micro Start Line = " + cfXmlFileMicroAL.get(j).startline + " Micro End Line = " + cfXmlFileMicroAL.get(j).endline + "\n");
+        }
+            
         } catch (Exception e) {
-            System.out.println("error in method xmlFileParse." + e);
+            System.out.println("error in method xmlFileParseMicro." + e);
             e.printStackTrace();
         }
-        return cfXmlFile;
+        return cfXmlFileMicroNew;
     }
 
     public CodeFragment getInstanceInNextRevision(CodeFragment cf) {
