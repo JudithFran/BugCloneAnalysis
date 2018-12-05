@@ -169,6 +169,7 @@ public class MainForm extends javax.swing.JFrame {
             // TODO add your handling code here:
             BugReplicationMicro brm = new BugReplicationMicro();
             brm.bugReplication();  
+            //brm.xmlFileParseMicro(700, "x");
         
         }catch(Exception e){
             System.out.println("error in BugReplicationMicro." + e);
