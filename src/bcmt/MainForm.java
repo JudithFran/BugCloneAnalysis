@@ -168,8 +168,10 @@ public class MainForm extends javax.swing.JFrame {
         try {
             // TODO add your handling code here:
             BugReplicationMicro brm = new BugReplicationMicro();
-            brm.bugReplication();  
-            //brm.xmlFileParseMicro(700, "x");
+            System.out.println("---------------------------------------Regular clone Analysis Starts Here--------------------------------------------\n");
+            brm.bugReplicationR();
+            System.out.println("-----------------------------------------Micro-clone Analysis Starts Here--------------------------------------------\n");
+            brm.bugReplicationM();
         
         }catch(Exception e){
             System.out.println("error in BugReplicationMicro." + e);
