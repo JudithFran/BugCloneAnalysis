@@ -167,9 +167,12 @@ public class MainForm extends javax.swing.JFrame {
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         try {
             // TODO add your handling code here:
+            
             BugReplicationMicro brm = new BugReplicationMicro();
             System.out.println("---------------------------------------Regular clone Analysis Starts Here--------------------------------------------\n");
             brm.bugReplicationR();
+            //brm.getChangedBugFixCommits();
+
             //System.out.println("-----------------------------------------Micro-clone Analysis Starts Here--------------------------------------------\n");
             //brm.bugReplicationM();
         
