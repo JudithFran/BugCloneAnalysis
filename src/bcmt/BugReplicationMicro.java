@@ -67,7 +67,7 @@ class CodeFragment {
             String str = "";
 
             System.out.println("\n" + revision + ": " + filepath + ", " + startline + " - " + endline + ", " + changetype);
-            System.out.println("---------------------------------------------------");
+            //System.out.println("---------------------------------------------------");
             int line = 0;
             int i = 0;
             while ((str = br.readLine()) != null) {
@@ -78,10 +78,10 @@ class CodeFragment {
                 if (line >= startline && line <= endline) {
                     lines[i] = str.trim();
                     i++;
-                    System.out.println(str);
+                    //System.out.println(str);
                 }
             }
-            System.out.println("---------------------------------------------------");
+            //System.out.println("---------------------------------------------------");
         } catch (Exception e) {
             System.out.println("error.showFragment." + e);
         }
@@ -263,7 +263,7 @@ public class BugReplicationMicro {
                             if(isClonePairBinary(cloneFragmentPairINR[0], cloneFragmentPairINR[1]) == 1){
                                 numReplicatedBugFixCommits++;
                                 System.out.println("////////////////////////////////////////////////////////////////////////////Replicated Bug Fixing Change Found////////////////////////////////////////////////////////////////////////////.");
-                                System.out.println("numReplicatedBugFixCommits for Regular Clones = " + numReplicatedBugFixCommits);
+                                //System.out.println("numReplicatedBugFixCommits for Regular Clones = " + numReplicatedBugFixCommits);
                                 
                                 bugRep.add(cloneFragmentPair[x][0]);
                                 bugRep.add(cloneFragmentPair[x][1]);
@@ -271,6 +271,35 @@ public class BugReplicationMicro {
                         }
                 }
             }
+            System.out.println("Total Number of Pairs of Replicated Bug-Fix Commits for Regular Clones = " + numReplicatedBugFixCommits);
+            
+            System.out.println("\nThis is the array of replicated bugs: ");
+            for(int i=0; i<bugRep.size(); i++){
+                //System.out.println("\nThis is the array of replicated bugs: i = " + i);
+                bugRep.get(i).getFragment();
+                bugRep.get(i).showFragment();
+            }
+            
+            // Removing the duplicate values
+            for(int i = 0; i < bugRep.size(); i++){
+                for(int j = i+1; j < bugRep.size(); j++){
+                    
+                    if(bugRep.get(i).revision == bugRep.get(j).revision && bugRep.get(i).filepath.equals(bugRep.get(j).filepath) 
+                        && bugRep.get(i).startline == bugRep.get(j).startline && bugRep.get(i).endline == bugRep.get(j).endline){
+                        bugRep.remove(j);
+                        j--;                          
+                    }
+                }
+            }
+            
+            System.out.println("\nThis is the array of replicated bugs after removing duplicate objects: ");
+            for(int i=0; i<bugRep.size(); i++){
+                //System.out.println("\nThis is the array of replicated bugs after removing duplicate objects: i = " + i);
+                bugRep.get(i).getFragment();
+                bugRep.get(i).showFragment();
+            }
+            
+            System.out.println("\nTotal distinc number of replicated bugs in regular code clone = " + bugRep.size());
             
         }catch(Exception e){
             System.out.println("error in BugReplicationR = " + e);
@@ -313,11 +342,11 @@ public class BugReplicationMicro {
                                         
                                             System.out.println("*********************************************** File Name matched ***********************************************");
                                             
-                                            System.out.println("Matched CF from changedBugFixCommits["+i+"]["+j+"] = " + changedBugFixCommits[i][j].filepath + " Start Line = " 
-                                                    + changedBugFixCommits[i][j].startline + " End Line = " + changedBugFixCommits[i][j].endline);
+                                            //System.out.println("Matched CF from changedBugFixCommits["+i+"]["+j+"] = " + changedBugFixCommits[i][j].filepath + " Start Line = " 
+                                                    //+ changedBugFixCommits[i][j].startline + " End Line = " + changedBugFixCommits[i][j].endline);
                                             
-                                            System.out.println("Matched CF1 from cfXmlFile["+m+"]["+n+"] = " + cfXmlFile[m][n].filepath + " Start Line = " + cfXmlFile[m][n].startline 
-                                                + " End Line = " + cfXmlFile[m][n].endline);
+                                            //System.out.println("Matched CF1 from cfXmlFile["+m+"]["+n+"] = " + cfXmlFile[m][n].filepath + " Start Line = " + cfXmlFile[m][n].startline 
+                                                //+ " End Line = " + cfXmlFile[m][n].endline);
                                             
                                             // Saving the matched entries into a separate 1D array
                                             cfXmlFileMatch[x] = cfXmlFile[m][n];
@@ -390,6 +419,26 @@ public class BugReplicationMicro {
             e.printStackTrace();
         }
         return cfp;
+    }
+    
+    public int isClonePairBinary(CodeFragment cf1, CodeFragment cf2){
+        int pair = 0;
+        try{
+            int classID1 = 0, classID2 = 0;
+            
+            classID1 = getClassID(cf1);
+
+            classID2 = getClassID(cf2);
+            
+            if(classID1 == classID2){
+                pair = 1;
+            }
+            
+        }catch (Exception e) {
+            System.out.println("error in method isClonePairBinary = " + e);
+            e.printStackTrace();
+        }
+        return pair;
     }
     
     public int getClassID(CodeFragment cf) {
@@ -468,55 +517,6 @@ public class BugReplicationMicro {
             e.printStackTrace();
         }
         return 0;
-    }
-    
-    public int isClonePairBinary(CodeFragment cf1, CodeFragment cf2){
-        int pair = 0;
-        try{
-            CodeFragment[][] cfXmlFile = new CodeFragment[10000][10000];
-
-            cfXmlFile = xmlFileParse(cf1.revision);
-
-            for (int i = 0; i < cfXmlFile.length; i++) {
-                for (int j = 0; j < cfXmlFile.length; j++) {
-
-                    if (cfXmlFile[i][j] != null){
-                        //System.out.println("cfXmlFile[" + i + "][" + j + "] = " + cfXmlFile[i][j].filepath);
-                        if(cf1.filepath.equals(cfXmlFile[i][j].filepath)){
-                            /*
-                            System.out.println("cf1.startline = " + cf1.startline);
-                            System.out.println("cfXmlFile["+i+"]["+j+"].startline = " +cfXmlFile[i][j].startline);
-                            System.out.println("cf1.endline = " + cf1.endline);
-                            System.out.println("cfXmlFile["+i+"]["+j+"].endline = " +cfXmlFile[i][j].endline);
-                            */
-                            if(((cf1.startline >= cfXmlFile[i][j].startline) && (cf1.endline <= cfXmlFile[i][j].endline))
-                                    ||((cf1.startline <= cfXmlFile[i][j].startline) && (cf1.endline <= cfXmlFile[i][j].endline) && (cf1.endline >= cfXmlFile[i][j].startline)) 
-                                        ||((cf1.startline >= cfXmlFile[i][j].startline) && (cf1.endline >= cfXmlFile[i][j].endline) && (cf1.startline <= cfXmlFile[i][j].endline))){
-                                //System.out.println("cfXmlFile[" + i + "][" + j + "] filepath = " + cfXmlFile[i][j].filepath + " revision = " 
-                                    //+ cfXmlFile[i][j].revision + " startline = " + cfXmlFile[i][j].startline + " endline = " + cfXmlFile[i][j].endline);
-                                
-                                if(cfXmlFile[i][j+1] != null && cf1.filepath.equals(cfXmlFile[i][j+1].filepath)){
-                                    cf2.revision = cfXmlFile[i][j+1].revision;
-                                    cf2.startline = cfXmlFile[i][j+1].startline;
-                                    cf2.endline = cfXmlFile[i][j+1].endline;
-                                    cf2.filepath = cfXmlFile[i][j+1].filepath;
-                                    cf2.changetype = cfXmlFile[i][j+1].changetype;
-                                    //System.out.println("************************************************************************************Clone Pair Found************************************************************************************");
-                                    //System.out.println("\nCode Fragment 2 (CF2): ");
-                                    //cf2.getFragment();
-                                    //cf2.showFragment();
-                                    pair = 1;   
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }catch (Exception e) {
-            System.out.println("error in method isClonePair." + e);
-            e.printStackTrace();
-        }
-        return pair;
     }
     
     public CodeFragment[][] xmlFileParse(int rev) {
