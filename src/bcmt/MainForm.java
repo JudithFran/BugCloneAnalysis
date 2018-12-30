@@ -169,12 +169,11 @@ public class MainForm extends javax.swing.JFrame {
             // TODO add your handling code here:
             
             BugReplicationMicro brm = new BugReplicationMicro();
-            System.out.println("---------------------------------------Regular clone Analysis Starts Here--------------------------------------------\n");
-            brm.bugReplicationR();
-            //brm.getChangedBugFixCommits();
+            //System.out.println("---------------------------------------Regular clone Analysis Starts Here--------------------------------------------\n");
+            //brm.bugReplicationR();
 
-            //System.out.println("-----------------------------------------Micro-clone Analysis Starts Here--------------------------------------------\n");
-            //brm.bugReplicationM();
+            System.out.println("-----------------------------------------Micro-clone Analysis Starts Here--------------------------------------------\n");
+            brm.bugReplicationM();
         
         }catch(Exception e){
             System.out.println("error in BugReplicationMicro." + e);
