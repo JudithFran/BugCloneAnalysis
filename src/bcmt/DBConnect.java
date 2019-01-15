@@ -25,8 +25,10 @@ public class DBConnect {
     Statement stmt;
     public ResultSet result;
     String query = "SELECT * FROM `changes` ";
-        
-    String connectionString = "jdbc:mysql://localhost:3306/ctags";
+    
+    // Need to make variable
+    String connectionString = "jdbc:mysql://localhost:3306/" + InputParameters.systemName; // Brlcad
+    //String connectionString = "jdbc:mysql://localhost:3306/ctags"; // Ctags
     String userID = "root";
     String password = "";   
     
