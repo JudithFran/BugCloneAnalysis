@@ -81,7 +81,7 @@ public class MainForm extends javax.swing.JFrame {
 
         jLabel2.setText("Select Subject System");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ctags", "Freecol", "Carol", "Jabref" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Select", "Ctags", "Brlcad", "MonoOSC", "Freecol", "Carol", "Jabref" }));
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox1ActionPerformed(evt);
@@ -167,8 +167,15 @@ public class MainForm extends javax.swing.JFrame {
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         try {
             // TODO add your handling code here:
+            String systemName = "";
+            systemName = jComboBox1.getSelectedItem().toString();
+            //System.out.println("System selected in ComboBox: " + systemName);
             
+            InputParameters ip = new InputParameters();
+            ip.setParameters(systemName);
+                        
             BugReplicationMicro brm = new BugReplicationMicro();
+            
             //System.out.println("---------------------------------------Regular clone Analysis Starts Here--------------------------------------------\n");
             //brm.bugReplicationR();
 
@@ -190,8 +197,13 @@ public class MainForm extends javax.swing.JFrame {
         String systemName = "";
         systemName = jComboBox1.getSelectedItem().toString();
         //System.out.println("System selected: " + systemName);
+        
         if(systemName == "Ctags")
             jLabel3.setText("<html>System's Name: Ctags <br> Programming Language: C <br> Last Revision Number: 774</html>");
+        else if(systemName == "Brlcad")
+            jLabel3.setText("<html>System's Name: Brlcad <br> Programming Language: C <br> Last Revision Number: 735</html>");
+        else if(systemName == "MonoOSC")
+            jLabel3.setText("<html>System's Name: MonoOSC <br> Programming Language: C# <br> Last Revision Number: 315</html>");
         else if(systemName == "Freecol")
             jLabel3.setText("<html>System's Name: Freecol <br> Programming Language: Java <br> Last Revision Number: 1950</html>");
         else if(systemName == "Carol")
