@@ -9,15 +9,56 @@ package bcmt;
  *
  * @author Judith
  */
-
-class Parameters{
-    String path = "", programmingLanguage = "";
-    int lastRevision;
-    
-}
-
 public class InputParameters {
     
+    public static String systemName = "", pathRegular = "", pathMicro = "", programmingLanguage = "";
+    public static int lastRevision;
     
+    public void setParameters(String sysName){
+        try{
+        
+        if(sysName.equals("Ctags")){
+                systemName = sysName;
+                lastRevision = 774;
+                pathRegular = "C:/RegularClones/Ctags/Repository/version-";
+                pathMicro = "C:/MicroClones/Systems/Ctags/Repository/version-";
+                programmingLanguage = "C";
+        }
+        else if(sysName.equals("Brlcad")){
+                systemName = sysName;
+                lastRevision = 735;
+                pathRegular = "C:/RegularClones/Brlcad/Repository/version-";
+                pathMicro = "C:/MicroClones/Systems/Brlcad/Repository/version-";
+                programmingLanguage = "C";
+        }
+        else if(sysName.equals("MonoOSC")){
+                systemName = sysName;
+                lastRevision = 315;
+                pathRegular = "C:/RegularClones/Monoosc/Repository/version-";
+                pathMicro = "C:/MicroClones/Systems/Monoosc/Repository/version-";
+                programmingLanguage = "C#";
+        }
+        else if(sysName.equals("Select")){
+            System.out.println("Please select a valid subject system.");
+        }    
+        
+        
+        System.out.println("This is inside setParameters systemName = " + systemName + " Programming language = " + programmingLanguage + " Regular path = " + pathRegular 
+            + " Micro path = " + pathMicro + " Last revision = " + lastRevision);
+        
+        }catch(Exception e){
+            System.out.println("error in method setParameters = " + e);
+            e.printStackTrace();
+        }
+    }
+    
+    public void getParameters(){
+        try{
+            System.out.println("Inside getParameters, System name = " + systemName);
+        }catch(Exception e){
+            System.out.println("error in method getParameters = " + e);
+            e.printStackTrace();
+        }
+    }
     
 }
