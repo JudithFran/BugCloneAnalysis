@@ -38,6 +38,27 @@ public class InputParameters {
                 pathMicro = "C:/MicroClones/Systems/Monoosc/Repository/version-";
                 programmingLanguage = "C#";
         }
+        else if(sysName.equals("Freecol")){
+                systemName = sysName;
+                lastRevision = 1950;
+                pathRegular = "C:/RegularClones/Freecol/Repository/version-";
+                pathMicro = "C:/MicroClones/Systems/Freecol/Repository/version-";
+                programmingLanguage = "Java";
+        }
+        else if(sysName.equals("Carol")){
+                systemName = sysName;
+                lastRevision = 1700;
+                pathRegular = "C:/RegularClones/Carol/Repository/version-";
+                pathMicro = "C:/MicroClones/Systems/Carol/Repository/version-";
+                programmingLanguage = "Java";
+        }
+        else if(sysName.equals("Jabref")){
+                systemName = sysName;
+                lastRevision = 1545;
+                pathRegular = "C:/RegularClones/Jabref/Repository/version-";
+                pathMicro = "C:/MicroClones/Systems/Jabref/Repository/version-";
+                programmingLanguage = "Java";
+        }
         else if(sysName.equals("Select")){
             System.out.println("Please select a valid subject system.");
         }    
