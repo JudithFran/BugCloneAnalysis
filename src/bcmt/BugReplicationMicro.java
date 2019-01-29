@@ -143,7 +143,7 @@ public class BugReplicationMicro {
     
     public CodeFragment[][] getChangedBugFixCommits() {
 
-        SingleChange[] changedBugFixCommits = new SingleChange[10000];
+        SingleChange[] changedBugFixCommits = new SingleChange[50000];
         SingleChange[][] changedBugFixCommits2D = new SingleChange[10000][10000];
         CodeFragment[][] changedBugFixCommits2DNew = new CodeFragment[10000][10000];
 
@@ -152,6 +152,7 @@ public class BugReplicationMicro {
             String str = getBugFixCommits();
             String[] bugFixCommits = new String[10000];
 
+            //SingleChange[] changes = new SingleChange[10000];
             SingleChange[] changes = db.getChangedRevisions();
 
             /*
@@ -242,10 +243,80 @@ public class BugReplicationMicro {
         return changedBugFixCommits2DNew;
     }
     
-    public void bugReplicationR(){
+    public int bugReplication(){
+        try{
+            int countFragmentR = 0;
+            int countFragmentM = 0;
+            int countRevision = 0;
+            
+            ArrayList<CodeFragment> bugRepR = new ArrayList<>();
+            ArrayList<CodeFragment> bugRepM = new ArrayList<>();
+            
+            
+            System.out.println("---------------------------------------Regular Clone Analysis Starts Here--------------------------------------------\n");
+            bugRepR = bugReplicationR();
+            countFragmentR = bugRepR.size();
+            
+            System.out.println("-----------------------------------------Micro Clone Analysis Starts Here--------------------------------------------\n");
+            bugRepM = bugReplicationM();
+            countFragmentM = bugRepM.size();
+            
+            // Remove all duplicates
+            bugRepR.removeAll(bugRepM);
+            
+            // Merge two arraylists
+            bugRepR.addAll(bugRepM);
+            
+            System.out.println("\nThis is the array of replicated bugs after UNION operation in between Regular and Micro: ");
+            for(int i=0; i<bugRepR.size(); i++){
+                //System.out.println("\nThis is the array of replicated bugs after UNION operation in between Regular and Micro: i = " + i);
+                bugRepR.get(i).getFragment();
+                bugRepR.get(i).showFragment();
+            }
+            
+            // Removing the duplicate values based on revisions only
+            // Removing duplicate revisions so that we can count the distinct revisions only
+            for(int i = 0; i < bugRepR.size(); i++){
+                for(int j = i+1; j < bugRepR.size(); j++){
+                    
+                    if(bugRepR.get(i).revision == bugRepR.get(j).revision){
+                        bugRepR.remove(j);
+                        j--;                          
+                    }
+                }
+            }
+            
+            System.out.println("\nThis is the array of replicated bugs after UNION operation in between Regular and Micro and after removing duplicate revision number: ");
+            for(int i=0; i<bugRepR.size(); i++){
+                //System.out.println("\nThis is the array of replicated bugs after UNION operation in between Regular and Micro and after removing duplicate revision number: i = " + i);
+                bugRepR.get(i).getFragment();
+                bugRepR.get(i).showFragment();
+            }
+            
+            countRevision = bugRepR.size();
+            
+            // Calculating the average number of replicated bugs for both regular and micro clones
+            
+            System.out.println("Total number of distinct clone fragments that experienced bug-replication in Regular clones = " + countFragmentR);
+            System.out.println("Total number of distinct clone fragments that experienced bug-replication in Micro clones = " + countFragmentM);
+            System.out.println("Total number of distinct revisions that experienced bug-replication in both Regular and Micro clones = " + countRevision);
+            
+            System.out.println("Distinct percentage of replicated bugs in regular clones per revision = " + (float) countFragmentR/countRevision);
+            System.out.println("Distinct percentage of replicated bugs in micro clones per revision = " + (float) countFragmentM/countRevision);
+            
+            
+            
+        }catch(Exception e){
+            System.out.println("error in BugReplication = " + e);
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    public ArrayList<CodeFragment> bugReplicationR(){
+        ArrayList<CodeFragment> bugRep = new ArrayList<>();
         try{          
             CodeFragment[][] cloneFragmentPair = new CodeFragment[10000][2];
-            ArrayList<CodeFragment> bugRep = new ArrayList<>();
             
             cloneFragmentPair = isClonePair();
             
@@ -323,12 +394,13 @@ public class BugReplicationMicro {
             System.out.println("error in BugReplicationR = " + e);
             e.printStackTrace();
         }
+        return bugRep;
     }
     
-    public void bugReplicationM(){
+    public ArrayList<CodeFragment> bugReplicationM(){
+        ArrayList<CodeFragment> bugRep = new ArrayList<>();
         try{
-            CodeFragment[][] cloneFragmentPair = new CodeFragment[10000][2];
-            ArrayList<CodeFragment> bugRep = new ArrayList<>();
+            CodeFragment[][] cloneFragmentPair = new CodeFragment[50000][2];
             
             cloneFragmentPair = isClonePairMicro();
             
@@ -407,6 +479,7 @@ public class BugReplicationMicro {
             System.out.println("error in BugReplicationM = " + e);
             e.printStackTrace();
         }
+        return bugRep;
     }
     
     public CodeFragment[][] isClonePair(){
@@ -525,16 +598,16 @@ public class BugReplicationMicro {
     }
             
     public CodeFragment[][] isClonePairMicro(){
-        CodeFragment[][] cfpMicro = new CodeFragment[10000][2];
+        CodeFragment[][] cfpMicro = new CodeFragment[50000][2];
         try{
             CodeFragment[][] changedBugFixCommits = new CodeFragment[10000][10000];
             changedBugFixCommits = getChangedBugFixCommits();
             
             CodeFragment[][] cfXmlFileMicro = new CodeFragment[10000][10000];
             
-            CodeFragment[] cfXmlFileMatch = new CodeFragment[10000];
+            CodeFragment[] cfXmlFileMatch = new CodeFragment[50000];
             
-            CodeFragment[][] cfpReg = new CodeFragment[10000][2];
+            CodeFragment[][] cfpReg = new CodeFragment[50000][2];
             
             int x = 0;
             
