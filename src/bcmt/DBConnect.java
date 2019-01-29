@@ -57,7 +57,7 @@ public class DBConnect {
     
     public SingleChange[] getChangedRevisions(){
         
-        SingleChange[] changes = new SingleChange[10000];
+        SingleChange[] changes = new SingleChange[50000];
         int i = 0;
         
         try{
