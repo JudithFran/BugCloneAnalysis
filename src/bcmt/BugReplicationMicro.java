@@ -106,7 +106,7 @@ public class BugReplicationMicro {
 
             String str = "";
             String prevString = "";
-
+                
             int commit = 0;
             while ((str = br.readLine()) != null) {
                 if (str.trim().length() == 0) {
@@ -122,7 +122,150 @@ public class BugReplicationMicro {
                     //System.out.println (commit);
                 } else {
                     //according to the study of Mockus
-                    if (str.toLowerCase().contains("bug") || str.toLowerCase().contains("fix") || str.toLowerCase().contains("fixup") || str.toLowerCase().contains("error") || str.toLowerCase().contains("fail")) //if (str.contains ("bug") || str.contains("fix") || str.contains ("fixup") || str.contains ("error") || str.contains ("fail"))
+                    if (str.toLowerCase().contains("bug") || str.toLowerCase().contains("fix") || str.toLowerCase().contains("fixup") || str.toLowerCase().contains("error") || str.toLowerCase().contains("fail")) 
+                    //if (str.contains ("bug") || str.contains("fix") || str.contains ("fixup") || str.contains ("error") || str.contains ("fail"))
+                    {
+                        if (!bugFixCommits.contains(" " + commit + " ")) {
+                            bugFixCommits += " " + commit + " ";
+                        }
+                    }                                          
+                }
+                prevString = str;
+            }
+            br.close();
+            //System.out.println ("Revisions that were created because of a bug fix = " + bugFixCommits);
+
+        } catch (Exception e) {
+            System.out.println("error in getBugFixCommits = " + e);
+        }
+
+        return bugFixCommits;
+    }
+    
+    // For RQ4 use this method
+    /*
+    public String getBugFixCommits() {
+        String bugFixCommits = "";
+        try{
+            String[] bugFixCommitsMockus = new String[10000];
+            String[] bugFixCommitsLamkanfi = new String[10000];
+            String[] bugFixCommitsTemp = new String[10000];
+            
+            String str1 = getBugFixCommitsMockus();
+            System.out.println ("Revisions that were created because of a bug fix (Mockus) = " + str1);
+            bugFixCommitsMockus = str1.trim().split("  ");
+            
+            for(int i = 0; i < bugFixCommitsMockus.length; i++)
+                System.out.println ("Revisions that were created because of a bug fix in bugFixCommitsMockus["+i+"] array (Mockus) = " + bugFixCommitsMockus[i]);
+            
+            String str2 = getBugFixCommitsLamkanfi();
+            System.out.println ("Revisions that were created because of a bug fix (Lamkanfi) = " + str2);
+            bugFixCommitsLamkanfi = str2.trim().split("  ");
+            
+            for(int i = 0; i < bugFixCommitsLamkanfi.length; i++)
+                System.out.println ("Revisions that were created because of a bug fix in bugFixCommitsLamkanfi["+i+"] array (Lamkanfi) = " + bugFixCommitsLamkanfi[i]);
+            
+            // Finding common commits in both arrays 
+            
+            for (int i = 0; i < bugFixCommitsMockus.length; i++) {
+                for (int j = 0; j < bugFixCommitsLamkanfi.length; j++) {
+                    if (bugFixCommitsMockus[i].equals(bugFixCommitsLamkanfi[j])) {
+                        // got the duplicate element
+                        //if (!bugFixCommits.contains(" " + bugFixCommitsMockus[i] + " ")) {
+                            bugFixCommits += " " + bugFixCommitsMockus[i] + " ";
+                        //}
+                    }
+                }
+            } 
+            System.out.println ("Revisions that were created because of a bug fix (Mockus and Lamkanfi) = " + bugFixCommits);
+            
+            bugFixCommitsTemp = bugFixCommits.trim().split("  ");
+            
+            for(int i = 0; i < bugFixCommitsTemp.length; i++)
+                System.out.println ("Revisions that were created because of a bug fix in bugFixCommitsTemp["+i+"] array (Temp) = " + bugFixCommitsTemp[i]);
+            
+            
+        } catch (Exception e) {
+            System.out.println("error in getBugFixCommits = " + e);
+        }
+
+        return bugFixCommits;
+    }
+    */
+    public String getBugFixCommitsMockus() {
+        String bugFixCommits = "";
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(InputParameters.systemName + " commitlog.txt")));
+            //BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("brlcad commitlog.txt"))); // Have to make it variable
+            //BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("ctags commitlog.txt"))); // Have to make it variable
+
+            String str = "";
+            String prevString = "";
+                
+            int commit = 0;
+            while ((str = br.readLine()) != null) {
+                if (str.trim().length() == 0) {
+                    continue;
+                }
+
+                if (prevString.contains("--------------------------------")) {
+                    //this is the starting of a commit report.
+                    //we need to know the commit number.
+                    String str1 = str.trim().split("[ ]+")[0].trim();
+                    str1 = str1.substring(1);
+                    commit = Integer.parseInt(str1);
+                    //System.out.println (commit);
+                } else {
+                    //according to the study of Mockus
+                    if (str.toLowerCase().contains("bug") || str.toLowerCase().contains("fix") || str.toLowerCase().contains("fixup") || str.toLowerCase().contains("error") || str.toLowerCase().contains("fail")) 
+                    //if (str.contains ("bug") || str.contains("fix") || str.contains ("fixup") || str.contains ("error") || str.contains ("fail"))
+                    {
+                        if (!bugFixCommits.contains(" " + commit + " ")) {
+                            bugFixCommits += " " + commit + " ";
+                        }
+                    }                                          
+                }
+                prevString = str;
+            }
+            br.close();
+            //System.out.println ("Revisions that were created because of a bug fix = " + bugFixCommits);
+
+        } catch (Exception e) {
+            System.out.println("error in getBugFixCommitsMockus = " + e);
+        }
+
+        return bugFixCommits;
+    }
+    
+    public String getBugFixCommitsLamkanfi() {
+        String bugFixCommits = "";
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(InputParameters.systemName + " commitlog.txt")));
+            //BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("brlcad commitlog.txt"))); // Have to make it variable
+            //BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("ctags commitlog.txt"))); // Have to make it variable
+
+            String str = "";
+            String prevString = "";
+            
+            int commit = 0;
+            while ((str = br.readLine()) != null) {
+                if (str.trim().length() == 0) {
+                    continue;
+                }
+
+                if (prevString.contains("--------------------------------")) {
+                    //this is the starting of a commit report.
+                    //we need to know the commit number.
+                    String str1 = str.trim().split("[ ]+")[0].trim();
+                    str1 = str1.substring(1);
+                    commit = Integer.parseInt(str1);
+                    //System.out.println (commit);
+                } else {
+                                            
+                    // Severe bugs according to Lamkanfi
+                    if (str.toLowerCase().contains("fault") || str.toLowerCase().contains("machin") || str.toLowerCase().contains("reboot") || str.toLowerCase().contains("reinstal") || str.toLowerCase().contains("lockup") || str.toLowerCase().contains("seemingli") || str.toLowerCase().contains("perman") || str.toLowerCase().contains("instantli") || str.toLowerCase().contains("segfault") || str.toLowerCase().contains("compil")
+                        || str.toLowerCase().contains("hang") || str.toLowerCase().contains("freez") || str.toLowerCase().contains("deadlock") || str.toLowerCase().contains("thread") || str.toLowerCase().contains("slow") || str.toLowerCase().contains("anymor") || str.toLowerCase().contains("memori") || str.toLowerCase().contains("tick") || str.toLowerCase().contains("jvm") || str.toLowerCase().contains("adapt") 
+                        || str.toLowerCase().contains("deadlock") || str.toLowerCase().contains("sigsegv") || str.toLowerCase().contains("relat") || str.toLowerCase().contains("caus") || str.toLowerCase().contains("snapshot") || str.toLowerCase().contains("segment") || str.toLowerCase().contains("core") || str.toLowerCase().contains("unexpectedli") || str.toLowerCase().contains("build") || str.toLowerCase().contains("loop")) 
                     {
                         if (!bugFixCommits.contains(" " + commit + " ")) {
                             bugFixCommits += " " + commit + " ";
@@ -135,7 +278,7 @@ public class BugReplicationMicro {
             //System.out.println ("Revisions that were created because of a bug fix = " + bugFixCommits);
 
         } catch (Exception e) {
-            System.out.println("error in getBugFixCommits = " + e);
+            System.out.println("error in getBugFixCommitsLamkanfi = " + e);
         }
 
         return bugFixCommits;
@@ -245,6 +388,8 @@ public class BugReplicationMicro {
     
     public int bugReplication(){
         try{
+            // --------------------------Implementing RQ1----------------------------
+            
             int countFragmentR = 0;
             int countFragmentM = 0;
             int countRevision = 0;
@@ -304,8 +449,7 @@ public class BugReplicationMicro {
             System.out.println("Distinct percentage of replicated bugs in regular clones per revision = " + (float) countFragmentR/countRevision);
             System.out.println("Distinct percentage of replicated bugs in micro clones per revision = " + (float) countFragmentM/countRevision);
             
-            
-            
+                        
         }catch(Exception e){
             System.out.println("error in BugReplication = " + e);
             e.printStackTrace();
@@ -326,6 +470,18 @@ public class BugReplicationMicro {
                         if(cloneFragmentPair[i][j] != null)
                             System.out.println("bugReplicationR: cfp["+i+"]["+j+"].revision = " + cloneFragmentPair[i][j].revision + " Filepath = " + cloneFragmentPair[i][j].filepath
                                 + " Startline = " + cloneFragmentPair[i][j].startline + " Endline = " + cloneFragmentPair[i][j].endline);
+            
+            // For RQ3
+            int countRevision = 1;
+            if(cloneFragmentPair != null)
+                for (int i = 0; cloneFragmentPair[i][0] != null; i++) 
+                    if(cloneFragmentPair[i+1][0] != null)
+                        if(cloneFragmentPair[i][0].revision != cloneFragmentPair[i+1][0].revision)
+                            countRevision++;
+                    
+                    
+            System.out.println("Total number of distinct bugs(revision) of code clones for Regular = " + countRevision);
+            
             
             // Finding Replicated Bugs
             int numReplicatedBugFixCommits = 0;
@@ -379,14 +535,14 @@ public class BugReplicationMicro {
             System.out.println("\nTotal distinct number of replicated bugs in regular code clone = " + bugRep.size());
             
             // Counting the distinct number replicated bug in regular clones per revision
-            int countRevisionRegular = 1;
+            int countRevisionRep = 1;
             for(int i = 0; i < bugRep.size()-1; i++)
                 if(bugRep.get(i).revision != bugRep.get(i+1).revision)
-                    countRevisionRegular++;   
+                    countRevisionRep++;   
             
-            System.out.println("\nTotal distinct number of replicated bug revision in regular code clone = " + countRevisionRegular);
+            System.out.println("\nTotal distinct number of replicated bug revision in regular code clone = " + countRevisionRep);
             
-            float averageCountRegular = (float)bugRep.size()/countRevisionRegular;
+            float averageCountRegular = (float)bugRep.size()/countRevisionRep;
                         
             System.out.println("\nDistinct number of replicated bugs in regular clones per revision = " + averageCountRegular);
             
@@ -410,6 +566,18 @@ public class BugReplicationMicro {
                         if(cloneFragmentPair[i][j] != null)
                             System.out.println("bugReplicationM: After excluding cloneFragmentPair["+i+"]["+j+"].revision = " + cloneFragmentPair[i][j].revision + " Filepath = " 
                                 + cloneFragmentPair[i][j].filepath + " Startline = " + cloneFragmentPair[i][j].startline + " Endline = " + cloneFragmentPair[i][j].endline);
+            
+            // For RQ3
+            int countRevision = 1;
+            if(cloneFragmentPair != null)
+                for (int i = 0; cloneFragmentPair[i][0] != null; i++)
+                    if(cloneFragmentPair[i+1][0] != null)
+                        if(cloneFragmentPair[i][0].revision != cloneFragmentPair[i+1][0].revision)
+                            countRevision++;
+                    
+            System.out.println("Total number of distinct bugs(revision) of code clones for Micro = " + countRevision);
+            
+            
             
             // Finding Replicated Bugs
             int numReplicatedBugFixCommits = 0;
@@ -464,14 +632,14 @@ public class BugReplicationMicro {
             System.out.println("\nTotal distinct number of replicated bugs in micro code clone = " + bugRep.size());
             
             // Counting the distinct number replicated bug in micro clones per revision
-            int countRevisionMicro = 1;
+            int countRevisionRep = 1;
             for(int i = 0; i < bugRep.size()-1; i++)
                 if(bugRep.get(i).revision != bugRep.get(i+1).revision)
-                    countRevisionMicro++;   
+                    countRevisionRep++;   
             
-            System.out.println("\nTotal distinct number of replicated bug revision in micro code clone = " + countRevisionMicro);
+            System.out.println("\nTotal distinct number of replicated bug revision in micro code clone = " + countRevisionRep);
             
-            float averageCountMicro = (float)bugRep.size()/countRevisionMicro;
+            float averageCountMicro = (float)bugRep.size()/countRevisionRep;
                         
             System.out.println("\nDistinct number of replicated bugs in micro clones per revision = " + averageCountMicro);
             
